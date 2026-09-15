@@ -34,7 +34,29 @@
       window.location.href = link.getAttribute('href');
     }
   });
+})();
 
-  var yearEl = document.getElementById('year');
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
+// Sidebar menu: one section visible at a time. The URL hash (#writing, #patents, ...)
+// keeps each section linkable and makes back/forward work. No element carries those ids,
+// so changing the hash never scrolls. The first paint is handled inline in <head>.
+(function () {
+  var root = document.documentElement;
+  var links = document.querySelectorAll('.nav__link');
+  if (!links.length) return;
+
+  function sync() {
+    var name = window.location.hash.slice(1);
+    var active = links[0];
+    for (var i = 0; i < links.length; i++) {
+      if (links[i].getAttribute('href') === '#' + name) active = links[i];
+    }
+    for (var j = 0; j < links.length; j++) {
+      if (links[j] === active) links[j].setAttribute('aria-current', 'page');
+      else links[j].removeAttribute('aria-current');
+    }
+    root.setAttribute('data-panel', active.getAttribute('href').slice(1));
+  }
+
+  window.addEventListener('hashchange', sync);
+  sync();
 })();
